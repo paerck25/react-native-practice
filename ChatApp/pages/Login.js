@@ -9,7 +9,9 @@ const Login = ({ navigation }) => {
     }
 
     const startChatting = () => {
-        navigation.push('Chat');
+        navigation.navigate('Chat',{
+            name : nickName
+          });
     }
 
     return (
@@ -45,9 +47,9 @@ const styles = StyleSheet.create({
         marginBottom: 20,
     },
     input: {
-        padding: 5,
+        paddingHorizontal: 40,
+        paddingBottom: 5,
         fontSize: 20,
-        width: '40%',
         height: 40,
         borderBottomColor: 'gray',
         borderBottomWidth: 1,
