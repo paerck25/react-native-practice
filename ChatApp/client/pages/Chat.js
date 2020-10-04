@@ -1,30 +1,43 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { View, Text, StyleSheet, Button } from 'react-native'
 import { ScrollView, TextInput } from 'react-native-gesture-handler'
+import io from 'socket.io-client';
 
 const Chat = ({ route }) => {
 
+    const socketRef = useRef();
+
     const { name } = route.params;
 
-    const [chat, setChat] = useState('');
+    const [message, setMessage] = useState('');
 
     const [chatList, setChatList] = useState([]);
 
     const onChangeChat = (text) => {
-        setChat(text);
+        setMessage(text);
     }
 
+    useEffect(() => {
+        socketRef.current = io('http://localhost:4000');
+
+        socketRef.current.on('chat message', (msg) => {
+            setChatList((chatList) => [...chatList, msg])
+        })
+
+        return () => {
+            socketRef.current.disconnect();
+        }
+    }, [])
+
     const onSubmitChat = () => {
-        setChatList([
-            ...chatList,
-            chat
-        ])
-        setChat('');
+        socketRef.current.emit('chat message', { name, message });
+        setMessage('');
     }
 
     const printChatList = chatList.map((chat, index) => {
-        return <Text key={index}>{name} : {chat}</Text>;
+        return <Text key={index}>{chat.name} : {chat.message}</Text>;
     })
+
 
     return (
         <View style={styles.container}>
@@ -32,7 +45,7 @@ const Chat = ({ route }) => {
                 {printChatList}
             </ScrollView>
             <View style={styles.inputContainer}>
-                <TextInput autoFocus={true} style={styles.input} value={chat} onChangeText={onChangeChat} onSubmitEditing={onSubmitChat} />
+                <TextInput autoFocus={true} style={styles.input} value={message} onChangeText={onChangeChat} onSubmitEditing={onSubmitChat} />
                 <Button onPress={onSubmitChat} title="입력" />
             </View>
         </View>

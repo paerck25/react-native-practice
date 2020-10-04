@@ -9,9 +9,13 @@ const Login = ({ navigation }) => {
     }
 
     const startChatting = () => {
-        navigation.navigate('Chat',{
-            name : nickName
-          });
+        if(nickName){
+            navigation.navigate('Chat',{
+                name : nickName
+              });
+        } else {
+            alert('닉네임을 입력해주세요!')
+        }
     }
 
     return (
